@@ -37,9 +37,11 @@ void test_network() {
 	net->add_layer(std::make_unique<layer::DenseLayer>(2, 16));
 	net->add_layer(std::make_unique<layer::DenseLayer>(16, 8));
 	net->add_layer(std::make_unique<layer::DenseLayer>(8, 1));
-	for (auto i = 0; i < 100000; ++i) {
+	for (auto i = 0; i < 10000; ++i) {
 		net->train(input, label);
-		saver.save(net);
+		// std::cout << "loss: " << net->backward(input).squaredNorm() << std::endl;
+		std::cout << "epoch: " << i << std::endl;
+		// saver.save(net);
 	}
 	const Eigen::MatrixXd test = Eigen::MatrixXd::Random(10, 2);
 	std::cout << "input:\n" << test << '\n' << std::endl;

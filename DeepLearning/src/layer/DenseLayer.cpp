@@ -20,8 +20,7 @@ Eigen::MatrixXd DenseLayer::forward(const Eigen::MatrixXd & input) {
 	// 保存输入用于反向传播
 	m_last_input = input;
 	// 线性变换: output = input * weight + bias
-	const auto linear_output = input * m_weight + m_bias;
-
+	const auto linear_output = (input * m_weight).rowwise() + m_bias;
 	return linear_output;
 }
 
@@ -33,7 +32,7 @@ Eigen::MatrixXd DenseLayer::backward(const Eigen::MatrixXd & grad_output) {
 	m_bias_grad = grad_output.colwise().sum();
 
 	// 返回输入的梯度，用于前一层的反向传播
-	return grad_output * m_weight.transpose() + m_bias;
+	return grad_output * m_weight.transpose();
 }
 
 void DenseLayer::update(const float learning_rate) {

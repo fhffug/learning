@@ -18,9 +18,9 @@ private:
 	/// 权重
 	Eigen::MatrixXd m_weight;
 	/// 偏置
-	Eigen::VectorXd m_bias;
+	Eigen::RowVectorXd m_bias;
 	Eigen::MatrixXd m_weight_grad;
-	Eigen::VectorXd m_bias_grad;
+	Eigen::RowVectorXd m_bias_grad;
 
 	/// 上一次的输入
 	Eigen::MatrixXd m_last_input;
