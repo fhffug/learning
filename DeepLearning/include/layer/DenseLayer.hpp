@@ -30,7 +30,7 @@ public:
 
 	Eigen::MatrixXd backward(const Eigen::MatrixXd & grad_output) override;
 
-	void update(float learning_rate) override;
+	void update(double learning_rate) override;
 
 	[[nodiscard]] data::LayerData toData() const override;
 

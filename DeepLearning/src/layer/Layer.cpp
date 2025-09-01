@@ -3,7 +3,7 @@
 //
 #include "layer/Layer.hpp"
 
-ml::layer::Layer * ml::layer::load_layer(const std::string & path) {
+ml::layer::Layer * ml::layer::load_layer([[maybe_unused]] const std::string & path) {
 	return nullptr;
 }
 

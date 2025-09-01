@@ -43,8 +43,8 @@ Eigen::MatrixXd NeuralNetworkTesting::backward(const Eigen::MatrixXd & input) {
 
 void NeuralNetworkTesting::train(const Eigen::MatrixXd & input, const Eigen::MatrixXd & label) {
 	// 计算损失
-	const auto & output = this->forward(input);
-	const auto & loss = 2.0 * (output - label);
+	const auto output = this->forward(input);
+	const auto loss = 2.0 * (output - label);
 	this->backward(loss);
 	for (const auto & layer: std::ranges::reverse_view(layers))
 		layer->update(0.1);

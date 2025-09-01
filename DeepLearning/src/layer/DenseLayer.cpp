@@ -7,12 +7,14 @@
 namespace ml::layer {
 DenseLayer::DenseLayer(const int32_t input_dim, const int32_t output_dim)
 	: Layer(input_dim, output_dim),
-	  m_weight(input_dim, output_dim),
-	  m_bias(output_dim) {
+	  m_weight(input_dim, output_dim), m_bias(output_dim),
+	  m_weight_grad(input_dim, output_dim), m_bias_grad(output_dim) {
 	assert(input_dim > 0 && "Input size must be positive");
 	assert(output_dim > 0 && "Output size must be positive");
 	m_weight = Eigen::MatrixXd::Random(input_dim, output_dim) * 0.5;
 	m_bias.setZero();
+	m_weight_grad.setZero();
+	m_bias_grad.setZero();
 }
 
 
@@ -35,7 +37,12 @@ Eigen::MatrixXd DenseLayer::backward(const Eigen::MatrixXd & grad_output) {
 	return grad_output * m_weight.transpose();
 }
 
-void DenseLayer::update(const float learning_rate) {
+void DenseLayer::update(const double learning_rate) {
+	m_weight -= learning_rate * m_weight_grad;
+	m_bias -= learning_rate * m_bias_grad;
+	// 清零梯度，为下一次迭代做准备
+	m_weight_grad.setZero();
+	m_bias_grad.setZero();
 }
 
 data::LayerData DenseLayer::toData() const {

@@ -1,42 +1,91 @@
 cmake_minimum_required(VERSION 3.31)
 project(AIcpp VERSION 1.0.0 LANGUAGES CXX)
-set(CMAKE_BUILD_TYPE Debug)
 
 # 设置 C++ 标准
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)  # 禁用编译器扩展
 
-# 添加可执行文件
-add_executable(Main main.cpp)
+# 设置构建类型
+set(CMAKE_BUILD_TYPE Debug)
 
-# 指定 MyLibrary 的路径
-add_subdirectory(DeepLearning)
-add_subdirectory(ChineseChess)
+# 编译器特定设置
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(COMMON_WARNINGS
+            -Wall -Wextra -Wpedantic
+            -Wshadow -Wnon-virtual-dtor -Wold-style-cast
+            -Wcast-align -Wunused -Woverloaded-virtual
+            -Wconversion -Wsign-conversion
+            -Wnull-dereference -Wdouble-promotion
+            -Wformat=2 -Wimplicit-fallthrough
+    )
 
-# 链接 MyLibrary
-target_link_libraries(Main PUBLIC
-        DeepLearning
-        ChineseChess
-)
+    set(GCC_WARNINGS
+            -Wlogical-op -Wuseless-cast -Wduplicated-cond
+            -Wduplicated-branches -Wrestrict
+    )
 
-# 设置可执行文件的运行目录，以便找到 DLL
-set_target_properties(Main PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
+    # Debug 配置
+    set(CMAKE_CXX_FLAGS_DEBUG
+            "${CMAKE_CXX_FLAGS_DEBUG} -Og -g3"
+    )
 
-# 编译器优化
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    #    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og")
-    #    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -mtune=native")
-    #    set(CMAKE_C_FLAGS_RELEASE "-O3")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3 -march=native -mtune=native")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -mtune=native")
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O3 -march=native -mtune=native")
-    set(CMAKE_C_FLAGS_RELEASE "-O3 -march=native -mtune=native")
+    # Release 配置
+    set(CMAKE_CXX_FLAGS_RELEASE
+            "-O3 -DNDEBUG"
+    )
+
+    # 添加警告选项
+    add_compile_options(${COMMON_WARNINGS} ${GCC_WARNINGS})
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(COMMON_WARNINGS
+            -Wall -Wextra -Wpedantic
+            -Wshadow -Wnon-virtual-dtor -Wold-style-cast
+            -Wcast-align -Wunused -Woverloaded-virtual
+            -Wconversion -Wsign-conversion
+            -Wnull-dereference -Wdouble-promotion
+            -Wformat=2 -Wimplicit-fallthrough
+    )
+
+    set(CLANG_WARNINGS
+            -Wmost -Wdocumentation -Wdocumentation-unknown-command
+            -Wmissing-prototypes -Wimplicit-atomic-properties
+    )
+
+    # Debug 配置
+    set(CMAKE_CXX_FLAGS_DEBUG
+            "${CMAKE_CXX_FLAGS_DEBUG} -Og -g3"
+    )
+
+    # Release 配置
+    set(CMAKE_CXX_FLAGS_RELEASE
+            "-O3 -DNDEBUG"
+    )
+
+    # 添加警告选项
+    add_compile_options(${COMMON_WARNINGS} ${CLANG_WARNINGS})
+
 elseif (MSVC)
-    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /arch:AVX2")
-    set(CMAKE_C_FLAGS_RELEASE "/O2")
+    set(MSVC_WARNINGS
+            /W4  # 启用大多数警告
+            /w14242 /w14254 /w14263 /w14265 /w14287 /we4289 /w14296
+            /w14311 /w14545 /w14546 /w14547 /w14549 /w14555 /w14619
+            /w14640 /w14826 /w14905 /w14906 /w14928
+    )
+
+    # Debug 配置
+    set(CMAKE_CXX_FLAGS_DEBUG
+            "${CMAKE_CXX_FLAGS_DEBUG} /Od /Zi"
+    )
+
+    # Release 配置
+    set(CMAKE_CXX_FLAGS_RELEASE
+            "/O2 /DNDEBUG"
+    )
+
+    # 添加警告选项
+    add_compile_options(${MSVC_WARNINGS})
 endif ()
 
 # 并行构建配置
@@ -50,13 +99,36 @@ else ()
     if (N EQUAL 0)
         set(N 1)
     endif ()
-    set(CMAKE_BUILD_PARALLEL_LEVEL ${N})    # Ninja/Make并行任务数
+    set(CMAKE_BUILD_PARALLEL_LEVEL ${N})  # Ninja/Make并行任务数
 endif ()
 
 # 链接时优化
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)  # 默认关闭，可在Release中开启
 
-# 链接器优化
-#target_link_options(Main PRIVATE
-#        -s  # 删除符号表（Release模式）
-#)
+# 添加子目录
+add_subdirectory(DeepLearning)
+#add_subdirectory(ChineseChess)
+
+# 添加可执行文件
+add_executable(Main main.cpp resources/app.o)
+
+# 链接库
+target_link_libraries(Main PUBLIC
+        DeepLearning
+        #        ChineseChess
+)
+
+# 设置可执行文件的运行目录
+set_target_properties(Main PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
+
+# 目标特定设置
+target_compile_features(Main PRIVATE cxx_std_23)
+
+# Release 特定配置
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    set_target_properties(Main PROPERTIES
+            INTERPROCEDURAL_OPTIMIZATION ON
+    )
+endif ()

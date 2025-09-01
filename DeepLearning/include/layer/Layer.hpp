@@ -29,7 +29,7 @@ public:
 	virtual Eigen::MatrixXd backward(const Eigen::MatrixXd & input) = 0;
 
 	/// 更新参数
-	virtual void update(float learning_rate) = 0;
+	virtual void update(double learning_rate) = 0;
 
 	[[nodiscard]] int32_t get_input_dim() const;
 
