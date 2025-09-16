@@ -2,13 +2,17 @@
 // Created by 26326 on 25-8-5.
 //
 
+#include <utility>
+
 #include "layer/DenseLayer.hpp"
 
 namespace ml::layer {
-DenseLayer::DenseLayer(const int32_t input_dim, const int32_t output_dim)
+DenseLayer::DenseLayer(const Eigen::Index input_dim, const Eigen::Index output_dim)
 	: Layer(input_dim, output_dim),
-	  m_weight(input_dim, output_dim), m_bias(output_dim),
-	  m_weight_grad(input_dim, output_dim), m_bias_grad(output_dim) {
+	  m_weight(input_dim, output_dim),
+	  m_bias(output_dim),
+	  m_weight_grad(input_dim, output_dim),
+	  m_bias_grad(output_dim) {
 	assert(input_dim > 0 && "Input size must be positive");
 	assert(output_dim > 0 && "Output size must be positive");
 	m_weight = Eigen::MatrixXd::Random(input_dim, output_dim) * 0.5;
@@ -16,7 +20,6 @@ DenseLayer::DenseLayer(const int32_t input_dim, const int32_t output_dim)
 	m_weight_grad.setZero();
 	m_bias_grad.setZero();
 }
-
 
 Eigen::MatrixXd DenseLayer::forward(const Eigen::MatrixXd & input) {
 	// 保存输入用于反向传播
@@ -37,19 +40,8 @@ Eigen::MatrixXd DenseLayer::backward(const Eigen::MatrixXd & grad_output) {
 	return grad_output * m_weight.transpose();
 }
 
-void DenseLayer::update(const double learning_rate) {
-	m_weight -= learning_rate * m_weight_grad;
-	m_bias -= learning_rate * m_bias_grad;
-	// 清零梯度，为下一次迭代做准备
-	m_weight_grad.setZero();
-	m_bias_grad.setZero();
-}
-
-data::LayerData DenseLayer::toData() const {
-	data::LayerData layer_data;
-	layer_data.at("weight") = this->m_weight;
-	layer_data.at("bias") = this->m_bias;
-	return layer_data;
+data::LayerData * DenseLayer::data() const {
+	return m_data;
 }
 
 config::LayerConfig DenseLayer::config() const {

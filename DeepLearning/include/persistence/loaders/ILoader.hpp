@@ -5,7 +5,7 @@
 #ifndef AICPP_LOADER_HPP
 #define AICPP_LOADER_HPP
 
-namespace ml {
+namespace ml::loader {
 template<class T>
 class DEEPLEARNING_EXPORT ILoader {
 public:

@@ -5,13 +5,11 @@
 #ifndef LAYERDATA_HPP
 #define LAYERDATA_HPP
 
-#include "Data.hpp"
+#include "IData.hpp"
 
 
 namespace ml::data {
-class LayerData : public Data {
-public:
-	LayerData();
+class LayerData : public IData {
 };
 }
 

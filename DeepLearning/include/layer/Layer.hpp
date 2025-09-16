@@ -13,13 +13,14 @@
 namespace ml::layer {
 class DEEPLEARNING_EXPORT Layer {
 public:
-	Layer(int32_t input_dim, int32_t output_dim);
+	Layer(Eigen::Index input_dim, Eigen::Index output_dim) : m_input_dim(input_dim), m_output_dim(output_dim) {
+	}
 
 	virtual ~Layer() = default;
 
 protected:
-	const int32_t m_input_dim;
-	const int32_t m_output_dim;
+	const Eigen::Index m_input_dim;
+	const Eigen::Index m_output_dim;
 
 public:
 	/// 前向传播
@@ -28,21 +29,13 @@ public:
 	/// 反向传播
 	virtual Eigen::MatrixXd backward(const Eigen::MatrixXd & input) = 0;
 
-	/// 更新参数
-	virtual void update(double learning_rate) = 0;
+	[[nodiscard]] Eigen::Index get_input_dim() const { return m_input_dim; }
 
-	[[nodiscard]] int32_t get_input_dim() const;
+	[[nodiscard]] Eigen::Index get_output_dim() const { return m_output_dim; }
 
-	[[nodiscard]] int32_t get_output_dim() const;
+	[[nodiscard]] virtual data::LayerData * data() const = 0;
 
-	/// 保存层
-	virtual data::LayerData toData() const = 0;
-
-	virtual config::LayerConfig config() const = 0;
+	[[nodiscard]] virtual config::LayerConfig * config() const = 0;
 };
-
-template<typename T>
-concept LayerConcept = std::derived_from<T, Layer>;
-DEEPLEARNING_EXPORT Layer * load_layer(const std::string & path);
 }
 #endif //LAYER_HPP

@@ -30,6 +30,10 @@ public:
 	void train(const Eigen::MatrixXd & input, const Eigen::MatrixXd & label) override;
 
 	[[nodiscard]] config::NeuralNetConfig config() const override;
+
+	[[nodiscard]] std::string get_type() const override {
+		return "NeuralNetworkTesting";
+	}
 };
 }
 

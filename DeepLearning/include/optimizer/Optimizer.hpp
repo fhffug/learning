@@ -5,14 +5,14 @@
 #ifndef OPTIMIZER_HPP
 #define OPTIMIZER_HPP
 
-#include "lib_export.h"
+#include "layer/Layer.hpp"
 
 namespace ml::optimizer {
 class DEEPLEARNING_EXPORT Optimizer {
 public:
 	virtual ~Optimizer() = default;
 
-	virtual void update(float learning_rate) = 0;
+	virtual void update(Eigen::MatrixXd & params, const Eigen::MatrixXd & grads) = 0;
 };
 }
 

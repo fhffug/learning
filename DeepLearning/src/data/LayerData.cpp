@@ -4,7 +4,11 @@
 
 #include "../../include/data/LayerData.hpp"
 
-using namespace ml::data ;
+using namespace ml::data;
 
-LayerData::LayerData() = default;
-
+LayerData::LayerData(const Eigen::MatrixXd & weight,
+                     const Eigen::RowVectorXd & bias,
+                     const Eigen::MatrixXd & weight_grad,
+                     const Eigen::RowVectorXd & bias_grad)
+	: weight(weight), bias(bias), weight_grad(weight_grad), bias_grad(bias_grad) {
+}

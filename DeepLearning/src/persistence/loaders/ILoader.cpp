@@ -4,4 +4,4 @@
 
 #include "persistence/loaders/ILoader.hpp"
 
-using namespace ml;
+using namespace ml::loader;

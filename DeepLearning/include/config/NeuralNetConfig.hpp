@@ -17,6 +17,7 @@ public:
 	                std::string optimizer);
 
 private:
+	std::string type;
 	std::string name;
 	std::vector<std::string> layers_name;
 	std::vector<int32_t> input_shape;
@@ -32,6 +33,20 @@ public:
 	void to_json(nlohmann::ordered_json & json) const override;
 
 	void from_json(const nlohmann::ordered_json & json) override;
+
+	[[nodiscard]] const std::string & get_type() const { return type; };
+
+	[[nodiscard]] const std::string & get_name() const { return name; };
+
+	[[nodiscard]] const std::vector<std::string> & get_layers_name() const { return layers_name; };
+
+	[[nodiscard]] const std::vector<int32_t> & get_input_shape() const { return input_shape; };
+
+	[[nodiscard]] const std::vector<int32_t> & get_output_shape() const { return output_shape; };
+
+	[[nodiscard]] const std::string & get_loss() const { return loss; };
+
+	[[nodiscard]] const std::string & get_optimizer() const { return optimizer; };
 };
 }
 

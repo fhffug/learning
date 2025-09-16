@@ -5,7 +5,7 @@
 #ifndef AICPP_ISAVER_HPP
 #define AICPP_ISAVER_HPP
 
-namespace ml {
+namespace ml::saver {
 template<typename T>
 class DEEPLEARNING_EXPORT ISaver {
 public:

@@ -12,17 +12,14 @@ class DEEPLEARNING_EXPORT LayerConfig final : public IConfig {
 public:
 	LayerConfig() = default;
 
-	LayerConfig(int32_t input_dim, int32_t output_dim);
+	LayerConfig(Eigen::Index input_dim, Eigen::Index output_dim);
 
 private:
-	int32_t input_dim = 0;
-	int32_t output_dim = 0;
+	std::string type;
+	Eigen::Index input_dim = 0;
+	Eigen::Index output_dim = 0;
 
 public:
-	[[nodiscard]] int32_t get_input_dim() const;
-
-	[[nodiscard]] int32_t get_output_dim() const;
-
 	void to_json(nlohmann::json & json) const override;
 
 	void from_json(const nlohmann::json & json) override;
@@ -30,6 +27,12 @@ public:
 	void to_json(nlohmann::ordered_json & json) const override;
 
 	void from_json(const nlohmann::ordered_json & json) override;
+
+	[[nodiscard]] const std::string & get_type() const { return type; }
+
+	[[nodiscard]] Eigen::Index get_input_dim() const { return input_dim; }
+
+	[[nodiscard]] Eigen::Index get_output_dim() const { return output_dim; }
 };
 }
 

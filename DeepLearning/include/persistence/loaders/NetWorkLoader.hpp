@@ -7,11 +7,17 @@
 #include "ILoader.hpp"
 #include "NeuralNetwork.hpp"
 
-namespace ml {
+namespace ml::loader {
 class DEEPLEARNING_EXPORT NetWorkLoader final : public ILoader<NeuralNetwork> {
 public:
 	explicit NetWorkLoader(const std::filesystem::path & path) : ILoader(path) {
 	}
+
+	static bool test();
+
+	static NeuralNetwork * select_network(const config::NeuralNetConfig & conf);
+
+	static layer::Layer * select_layer(const config::LayerConfig & conf);
 
 	NeuralNetwork * load() override;
 

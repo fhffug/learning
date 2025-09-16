@@ -14,7 +14,8 @@ class DEEPLEARNING_EXPORT NeuralNetworkDebug final : public NeuralNetwork {
 public:
 	NeuralNetworkDebug();
 
-	NeuralNetworkDebug(std::string name, const std::vector<int32_t> & input_shape,
+	NeuralNetworkDebug(std::string name,
+	                   const std::vector<int32_t> & input_shape,
 	                   const std::vector<int32_t> & output_shape);
 
 private:
@@ -22,9 +23,9 @@ private:
 	std::vector<Eigen::MatrixXd> backward_output;
 
 public:
-	void add_layer(std::unique_ptr<layer::Layer> layer) override;
+	void add_layer(layer::Layer * layer) override;
 
-	[[nodiscard]] const std::vector<std::unique_ptr<layer::Layer>> & get_layers() const override;
+	[[nodiscard]] const std::vector<layer::Layer *> & get_layers() const override;
 
 	[[nodiscard]] Eigen::MatrixXd forward(const Eigen::MatrixXd & input) override;
 
@@ -34,6 +35,10 @@ public:
 	void train(const Eigen::MatrixXd & input, const Eigen::MatrixXd & label) override;
 
 	[[nodiscard]] config::NeuralNetConfig config() const override;
+
+	[[nodiscard]] std::string get_type() const override {
+		return std::string{"NeuralNetworkDebug"};
+	}
 
 	void view();
 };

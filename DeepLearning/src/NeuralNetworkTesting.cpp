@@ -46,8 +46,8 @@ void NeuralNetworkTesting::train(const Eigen::MatrixXd & input, const Eigen::Mat
 	const auto output = this->forward(input);
 	const auto loss = 2.0 * (output - label);
 	this->backward(loss);
-	for (const auto & layer: std::ranges::reverse_view(layers))
-		layer->update(0.1);
+	for (const auto & layer: std::ranges::reverse_view(layers)) {
+	}
 }
 
 config::NeuralNetConfig NeuralNetworkTesting::config() const {
@@ -60,4 +60,3 @@ config::NeuralNetConfig NeuralNetworkTesting::config() const {
 		input_shape, output_shape, "loss", "optimizer"
 	};
 }
-

@@ -12,16 +12,19 @@
 namespace ml::optimizer {
 class DEEPLEARNING_EXPORT Adam final : public Optimizer {
 public:
-	Adam(Eigen::MatrixXd &, Eigen::MatrixXd &);
+	Adam(double_t learning_rate, double_t beta1, double_t beta2, double_t epsilon);
 
 private:
-	/// 权重
-	Eigen::MatrixXd & m_weight;
-	/// 偏置
-	Eigen::MatrixXd & m_bias;
+	double_t learning_rate{0.001};
+	double_t beta1{0.9};
+	double_t beta2{0.999};
+	double_t epsilon{1e-8};
+	Eigen::MatrixXd m_ = Eigen::MatrixXd::Zero(0, 0); // 动态调整大小
+	Eigen::MatrixXd v_ = Eigen::MatrixXd::Zero(0, 0);
+	int32_t t = 0;
 
 public:
-	void update(float learning_rate) override;
+	void update(Eigen::MatrixXd & params, const Eigen::MatrixXd & grads) override;
 };
 }
 
