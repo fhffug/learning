@@ -6,85 +6,82 @@
 
 using namespace ml::saver;
 
-bool NetWorkSaver::save_config(const nlohmann::ordered_json & json, const std::filesystem::path & path) const {
-	const auto file_path = this->path / path;
+bool NetWorkSaver::save_network_config(const nlohmann::ordered_json & json) const {
 	// 如果文件存在，并且是文件，则创建备份
-	if (std::filesystem::exists(file_path) && std::filesystem::is_regular_file(file_path)) {
-		std::filesystem::path backup_path = file_path;
+	if (std::filesystem::exists(network_conf_path) && std::filesystem::is_regular_file(network_conf_path)) {
+		std::filesystem::path backup_path = network_conf_path;
 		backup_path += ".bak";
-		std::filesystem::copy_file(file_path, backup_path, std::filesystem::copy_options::overwrite_existing);
+		std::filesystem::copy_file(network_conf_path, backup_path, std::filesystem::copy_options::overwrite_existing);
 	}
-	std::fstream file(file_path, std::ios::out);
+	std::fstream file(network_conf_path, std::ios::out);
 	if (!file.is_open()) { return false; }
 	file << json;
 	file.close();
 	return true;
 }
 
-bool NetWorkSaver::save_bin(const data::LayerData & bin, const std::filesystem::path & path) const {
-	const auto file_path = this->path / path;
+bool NetWorkSaver::save_layer_config(const nlohmann::ordered_json & json, size_t index) const {
+	const auto layer_path = layer_conf_path / ("layer_" + std::to_string(index) + ".json");
 	// 如果文件存在，并且是文件，则创建备份
-	if (std::filesystem::exists(file_path) && std::filesystem::is_regular_file(file_path)) {
-		std::filesystem::path backup_path = file_path;
+	if (std::filesystem::exists(layer_path) && std::filesystem::is_regular_file(layer_path)) {
+		std::filesystem::path backup_path = layer_path;
 		backup_path += ".bak";
-		std::filesystem::copy_file(file_path, backup_path, std::filesystem::copy_options::overwrite_existing);
+		std::filesystem::copy_file(layer_path, backup_path, std::filesystem::copy_options::overwrite_existing);
 	}
-	std::fstream out(file_path, std::ios::out | std::ios::binary | std::ios::trunc);
+	std::fstream file{layer_path, std::ios::out};
+	if (!file.is_open()) { return false; }
+	file << json;
+	file.close();
+	return true;
+}
+
+bool NetWorkSaver::save_layer_bin(const data::LayerData * bin, size_t index) const {
+	const auto bin_path = layer_bin_path / ("layer_" + std::to_string(index) + ".bin");
+	// 如果文件存在，并且是文件，则创建备份
+	if (std::filesystem::exists(bin_path) && std::filesystem::is_regular_file(bin_path)) {
+		std::filesystem::path backup_path = bin_path;
+		backup_path += ".bak";
+		std::filesystem::copy_file(bin_path, backup_path, std::filesystem::copy_options::overwrite_existing);
+	}
+	std::fstream out{bin_path, std::ios::out | std::ios::binary | std::ios::trunc};
 	if (!out.is_open()) { return false; }
 
 	// 写入矩阵数量
-	size_t num_matrices = bin.items().size();
+	size_t num_matrices = bin->items().size();
 	out.write(reinterpret_cast<char *>(&num_matrices), sizeof(size_t));
-	for (const auto & item: bin.items()) {
+	for (const auto & [name, rows, cols, data]: bin->items()) {
 		// 写入矩阵名称
-		size_t name_len = item.key.size();
+		size_t name_len = name.size();
 		out.write(reinterpret_cast<char *>(&name_len), sizeof(size_t));
-		out.write(item.key.c_str(), static_cast<std::streamsize>(name_len));
+		out.write(name.c_str(), static_cast<std::streamsize>(name_len));
 		// 写入每个矩阵
-		Eigen::Index rows = item.rows;
-		Eigen::Index cols = item.cols;
-		out.write(reinterpret_cast<char *>(&rows), sizeof(Eigen::Index));
-		out.write(reinterpret_cast<char *>(&cols), sizeof(Eigen::Index));
-		out.write(item.data, static_cast<std::streamsize>(cols * rows * sizeof(double_t)));
+		out.write(reinterpret_cast<const char *>(&rows), sizeof(Eigen::Index));
+		out.write(reinterpret_cast<const char *>(&cols), sizeof(Eigen::Index));
+		out.write(data, static_cast<std::streamsize>(cols * rows * sizeof(double_t)));
 	}
 	out.close();
 	return true;
 }
 
-void NetWorkSaver::save_layers(const std::vector<std::unique_ptr<layer::Layer>> & layers) const {
-	if (!std::filesystem::exists(path / layer_conf_path) || !std::filesystem::is_directory(path / layer_conf_path))
-		std::filesystem::create_directories(path / layer_conf_path);
-	if (!std::filesystem::exists(path / layer_bin_path) || !std::filesystem::is_directory(path / layer_bin_path))
-		std::filesystem::create_directories(path / layer_bin_path);
-	for (const auto & [index,layer]: std::ranges::views::enumerate(layers)) {
-		// config
-		if (const bool success = save_config(layer->config(),
-		                                     layer_conf_path / ("layer_" + std::to_string(index) + ".json"));
-			!success) { std::cerr << "save layer " << index << " config failed" << std::endl; }
-		// bin
-		if (const bool success = save_bin(layer->data(), layer_bin_path / ("layer_" + std::to_string(index) + ".bin"));
-			!success) { std::cerr << "save layer " << index << " bin failed" << std::endl; }
-	}
-}
-
-void NetWorkSaver::save(const NeuralNetwork & net) const {
-	save(&net);
-}
-
-void NetWorkSaver::save(const std::shared_ptr<NeuralNetwork> & net) const {
-	save(net.get());
-}
-
-void NetWorkSaver::save(const std::unique_ptr<NeuralNetwork> & net) const {
-	save(net.get());
-}
-
 void NetWorkSaver::save(const NeuralNetwork * net) const {
-	if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
-		std::filesystem::create_directories(path);
+	if (!std::filesystem::exists(m_path) || !std::filesystem::is_directory(m_path)) {
+		std::filesystem::create_directories(m_path);
 	}
-	if (const bool success = save_config(net->config(), "net_config.json"); !success) {
+	if (!std::filesystem::exists(layer_conf_path) || !std::filesystem::is_directory(layer_conf_path)) {
+		std::filesystem::create_directories(layer_conf_path);
+	}
+	if (!std::filesystem::exists(layer_bin_path) || !std::filesystem::is_directory(layer_bin_path)) {
+		std::filesystem::create_directories(layer_bin_path);
+	}
+	if (!save_network_config(net->config())) {
 		std::cerr << "save net config failed" << std::endl;
 	}
-	save_layers(net->get_layers());
+	for (const auto & [index,layer]: std::views::enumerate(net->get_layers())) {
+		if (!save_network_config(*layer->config())) {
+			std::cerr << "save layer " << index << " config failed" << std::endl;
+		}
+		if (!save_layer_bin(layer->data(), index)) {
+			std::cerr << "save layer " << index << " bin failed" << std::endl;
+		}
+	}
 }

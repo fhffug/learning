@@ -9,17 +9,15 @@
 
 namespace ml::config {
 class DEEPLEARNING_EXPORT LayerConfig final : public IConfig {
-public:
-	LayerConfig() = default;
-
-	LayerConfig(Eigen::Index input_dim, Eigen::Index output_dim);
-
-private:
 	std::string type;
 	Eigen::Index input_dim = 0;
 	Eigen::Index output_dim = 0;
 
 public:
+	LayerConfig() = default;
+
+	LayerConfig(Eigen::Index input_dim, Eigen::Index output_dim);
+
 	void to_json(nlohmann::json & json) const override;
 
 	void from_json(const nlohmann::json & json) override;

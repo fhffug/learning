@@ -9,7 +9,22 @@
 
 
 namespace ml::data {
-class LayerData : public IData {
+class DEEPLEARNING_EXPORT LayerData : public IData {
+public:
+	struct DEEPLEARNING_EXPORT Item {
+		std::string name;
+		Eigen::Index rows{};
+		Eigen::Index cols{};
+		char * data{};
+
+		Item(std::string name, const Eigen::Index rows, const Eigen::Index cols, char * data)
+			: name(std::move(name)), rows(rows), cols(cols), data(data) {
+		}
+
+		Item() = default;
+	};
+
+	[[nodiscard]] virtual std::vector<Item> items() const = 0;
 };
 }
 

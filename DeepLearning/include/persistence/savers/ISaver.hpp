@@ -8,21 +8,14 @@
 namespace ml::saver {
 template<typename T>
 class DEEPLEARNING_EXPORT ISaver {
+protected:
+	std::filesystem::path m_path;
+
 public:
 	virtual ~ISaver() = default;
 
-	explicit ISaver(std::filesystem::path path) : path(std::move(path)) {
+	explicit ISaver(std::filesystem::path path) : m_path(std::move(path)) {
 	}
-
-protected:
-	std::filesystem::path path;
-
-public:
-	virtual void save(const T &) const = 0;
-
-	virtual void save(const std::shared_ptr<T> &) const = 0;
-
-	virtual void save(const std::unique_ptr<T> &) const = 0;
 
 	virtual void save(const T *) const = 0;
 };

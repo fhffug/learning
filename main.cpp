@@ -8,6 +8,7 @@
 #include "persistence/savers/NetWorkSaver.hpp"
 #pragma omp simd
 
+
 namespace color {
 constexpr std::string RESET = R"([0m)";
 constexpr std::string RED = R"([31m)";
@@ -19,31 +20,16 @@ constexpr std::string CYAN = R"([36m)";
 constexpr std::string WHITE = R"([37m)";
 }
 
+using namespace ml;
+
 int tag(double x, double y);
 
 void test_network();
 
-void test_saver() {
-	using namespace ml;
-	saver::NetWorkSaver saver{"E:\\models"};
-	std::vector<std::unique_ptr<layer::Layer>> layers;
-	layers.push_back(std::make_unique<layer::DenseLayer>(4, 16));
-	layers.push_back(std::make_unique<layer::DenseLayer>(16, 8));
-	layers.push_back(std::make_unique<layer::DenseLayer>(8, 2));
-	saver.save_layers(layers);
-}
-
-void test_loader() {
-	using namespace ml;
-	loader::NetWorkLoader loader{"E:/model"};
-	loader.test();
-}
 
 int main(int argc, char ** argv) {
 	try {
-		// test_network();
-		test_saver();
-		test_loader();
+		test_network();
 	} catch (std::exception & e) {
 		std::cout << "error:\n" << e.what() << std::endl;
 	} catch (...) {
@@ -53,7 +39,6 @@ int main(int argc, char ** argv) {
 }
 
 void test_network() {
-	using namespace ml;
 	const saver::NetWorkSaver saver{"E:/model"};
 	Eigen::setNbThreads(16);
 	Eigen::MatrixXd input = Eigen::MatrixXd::Random(10, 2);

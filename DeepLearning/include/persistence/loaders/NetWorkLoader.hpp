@@ -10,20 +10,18 @@
 namespace ml::loader {
 class DEEPLEARNING_EXPORT NetWorkLoader final : public ILoader<NeuralNetwork> {
 public:
-	explicit NetWorkLoader(const std::filesystem::path & path) : ILoader(path) {
-	}
-
-	static bool test();
-
-	static NeuralNetwork * select_network(const config::NeuralNetConfig & conf);
-
-	static layer::Layer * select_layer(const config::LayerConfig & conf);
+	using ILoader::ILoader;
+	const std::filesystem::path layer_conf_path = m_path / "layers_config";
+	const std::filesystem::path layer_bin_path = m_path / "layers_bin";
+	const std::filesystem::path network_conf_path = m_path / "network_config.json";
 
 	NeuralNetwork * load() override;
 
-	std::shared_ptr<NeuralNetwork> load_shared() override;
+	static bool test();
 
-	std::unique_ptr<NeuralNetwork> load_unique() override;
+	static NeuralNetwork * load_network(const std::filesystem::path & path);
+
+	static layer::Layer * load_layer(const std::filesystem::path & path);
 };
 } // ml
 

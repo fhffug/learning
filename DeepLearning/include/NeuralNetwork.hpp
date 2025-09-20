@@ -17,7 +17,9 @@ public:
 	              const std::vector<int32_t> & input_shape,
 	              const std::vector<int32_t> & output_shape);
 
-	virtual ~NeuralNetwork() = default;
+	virtual ~NeuralNetwork() {
+		for (const auto & layer: layers) { delete layer; }
+	};
 
 protected:
 	std::string name{"network"};

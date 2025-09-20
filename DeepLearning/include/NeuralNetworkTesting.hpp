@@ -12,14 +12,11 @@ namespace ml {
 // Testing
 class DEEPLEARNING_EXPORT NeuralNetworkTesting final : public NeuralNetwork {
 public:
-	NeuralNetworkTesting();
+	using NeuralNetwork::NeuralNetwork;
 
-	NeuralNetworkTesting(std::string name, const std::vector<int32_t> & input_shape,
-	                     const std::vector<int32_t> & output_shape);
+	void add_layer(layer::Layer * layer) override;
 
-	void add_layer(std::unique_ptr<layer::Layer> layer) override;
-
-	[[nodiscard]] const std::vector<std::unique_ptr<layer::Layer>> & get_layers() const override;
+	[[nodiscard]] const std::vector<layer::Layer *> & get_layers() const override;
 
 	/// 前向传播
 	[[nodiscard]] Eigen::MatrixXd forward(const Eigen::MatrixXd & input) override;

@@ -7,15 +7,6 @@
 // Debug
 using namespace ml;
 
-NeuralNetworkDebug::NeuralNetworkDebug() = default;
-
-NeuralNetworkDebug::NeuralNetworkDebug(std::string name,
-                                       const std::vector<int32_t> & input_shape,
-                                       const std::vector<int32_t> & output_shape)
-	: NeuralNetwork(std::move(name), input_shape, output_shape) {
-}
-
-
 void NeuralNetworkDebug::add_layer(layer::Layer * layer) {
 	if (!layers.empty() && layers.back()->get_output_dim() != layer->get_input_dim()) {
 		throw std::runtime_error("Input dimension does not match output dimension of previous layer.");

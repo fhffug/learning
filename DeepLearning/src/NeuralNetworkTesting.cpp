@@ -6,22 +6,14 @@
 
 using namespace ml;
 
-
-NeuralNetworkTesting::NeuralNetworkTesting() = default;
-
-NeuralNetworkTesting::NeuralNetworkTesting(std::string name, const std::vector<int32_t> & input_shape,
-                                           const std::vector<int32_t> & output_shape)
-	: NeuralNetwork(std::move(name), input_shape, output_shape) {
-}
-
-void NeuralNetworkTesting::add_layer(std::unique_ptr<layer::Layer> layer) {
+void NeuralNetworkTesting::add_layer(layer::Layer * layer) {
 	if (!layers.empty() && layers.back()->get_output_dim() != layer->get_input_dim()) {
 		throw std::runtime_error("Input dimension does not match output dimension of previous layer.");
 	}
-	layers.push_back(std::move(layer));
+	layers.push_back(layer);
 }
 
-const std::vector<std::unique_ptr<layer::Layer>> & NeuralNetworkTesting::get_layers() const {
+const std::vector<layer::Layer *> & NeuralNetworkTesting::get_layers() const {
 	return this->layers;
 }
 
@@ -57,6 +49,9 @@ config::NeuralNetConfig NeuralNetworkTesting::config() const {
 			auto [index, layer] = pair;
 			return "layer_" + std::to_string(index);
 		}) | std::ranges::to<std::vector>(),
-		input_shape, output_shape, "loss", "optimizer"
+		input_shape,
+		output_shape,
+		"loss",
+		"optimizer"
 	};
 }

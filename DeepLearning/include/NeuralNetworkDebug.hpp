@@ -11,18 +11,12 @@
 namespace ml {
 // Debug
 class DEEPLEARNING_EXPORT NeuralNetworkDebug final : public NeuralNetwork {
-public:
-	NeuralNetworkDebug();
-
-	NeuralNetworkDebug(std::string name,
-	                   const std::vector<int32_t> & input_shape,
-	                   const std::vector<int32_t> & output_shape);
-
-private:
 	std::vector<Eigen::MatrixXd> forward_output;
 	std::vector<Eigen::MatrixXd> backward_output;
 
 public:
+	using NeuralNetwork::NeuralNetwork;
+
 	void add_layer(layer::Layer * layer) override;
 
 	[[nodiscard]] const std::vector<layer::Layer *> & get_layers() const override;

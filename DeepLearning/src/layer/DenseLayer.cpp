@@ -7,6 +7,15 @@
 #include "layer/DenseLayer.hpp"
 
 namespace ml::layer {
+std::vector<data::LayerData::Item> DenseLayer::DenseLayerData::items() const {
+	return {
+		{"weight", m_weight.rows(), m_weight.cols(), reinterpret_cast<char *>(m_weight.data())},
+		{"bias", m_bias.rows(), m_bias.cols(), reinterpret_cast<char *>(m_bias.data())},
+		{"weight_grad", m_weight_grad.rows(), m_weight_grad.cols(), reinterpret_cast<char *>(m_weight_grad.data())},
+		{"bias_grad", m_bias_grad.rows(), m_bias_grad.cols(), reinterpret_cast<char *>(m_bias_grad.data())}
+	};
+}
+
 DenseLayer::DenseLayer(const Eigen::Index input_dim, const Eigen::Index output_dim)
 	: Layer(input_dim, output_dim),
 	  m_weight(input_dim, output_dim),
@@ -44,7 +53,7 @@ data::LayerData * DenseLayer::data() const {
 	return m_data;
 }
 
-config::LayerConfig DenseLayer::config() const {
+config::LayerConfig * DenseLayer::config() const {
 	return {m_input_dim, m_output_dim};
 }
 }
